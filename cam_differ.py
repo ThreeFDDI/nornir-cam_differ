@@ -120,7 +120,39 @@ def get_cam(task):
     )
 
 
+def unique_entries(mode):
+    if mode == "pre":
+        alt_mode = "post"
+    else:
+        alt_mode = "pre"
+
+    with open(f'output/{mode}_data.txt', 'r') as infile:
+        entries = json.load(infile)
+
+    with open(f'output/{alt_mode}_data.txt', 'r') as infile:
+        compare = json.load(infile)
+    
+    unique = []
+
+    for entry in entries:
+        if next(
+            (None for alt in compare if alt["destination_address"] == entry["destination_address"]),
+             entry) != None:
+            unique.append(entry)
+
+    return unique
+
 def diff_cam(task):
+
+    c_print("Unique entries seen before migration")
+
+    pre_only = unique_entries("pre")
+    pprint(pre_only)
+
+    c_print("Unique entries seen after migration")
+
+    post_only = unique_entries("post")
+    pprint(post_only)
 
     """
 
@@ -134,35 +166,6 @@ def diff_cam(task):
 
     """
 
-    """
-
-    with open("output/{task.host}_pre_cam.txt", "w+") as file:        
-        pre_cam = file.readlines()
-
-    with open("output/{task.host}_post_cam.txt", "w+") as file:        
-        post_cam = file.readlines()
-
-    for line in difflib.unified_diff(pre_cam, post_cam):
-        print(line)
-
-    with open('output/data.txt', 'w') as outfile:
-        json.dump(cam.result, outfile)
-
-    """
-
-    with open('output/pre_data.txt', 'r') as infile:
-        pre_data = json.load(infile)
-
-    with open('output/post_data.txt', 'r') as infile:
-        post_data = json.load(infile)
-
-    pre_only = []
-    
-    for pre in pre_data:
-        if next((None for post in post_data if post["destination_address"] == pre["destination_address"]), pre) != None:
-            pre_only.append(pre)
-
-    pprint(pre_only)
 
 
 # main function
