@@ -1,9 +1,10 @@
 import sys
+import json
 import difflib
 from getpass import getpass
 from nornir import InitNornir
 from nornir.plugins.tasks.networking import netmiko_send_command
-
+from pprint import pprint
 
 # print formatting function
 def c_print(printme):
@@ -104,8 +105,17 @@ def get_cam(task):
         use_textfsm=True
     )
 
-    print(cam.result)
+#    for entry in cam.result:
+#        pprint(entry)
 
+
+    with open('output/data.txt', 'w') as outfile:
+        json.dump(cam.result, outfile)
+
+    with open('output/data.txt', 'r') as infile:
+        data = json.load(infile)
+
+    pprint(data)
 
 def diff_cam(task):
 
