@@ -1,4 +1,5 @@
 import sys
+import difflib
 from getpass import getpass
 from nornir import InitNornir
 from nornir.plugins.tasks.networking import netmiko_send_command
@@ -104,6 +105,19 @@ def get_cam(task):
     )
 
     print(cam.result)
+
+
+def diff_cam(task):
+
+    with open("output/{task.host}_pre_cam.txt", "w+") as file:        
+        pre_cam = file.readlines()
+
+    with open("output/{task.host}_post_cam.txt", "w+") as file:        
+        post_cam = file.readlines()
+
+    for line in difflib.unified_diff(pre_cam, post_cam):
+        print(line)
+
 
 # main function
 def main():
