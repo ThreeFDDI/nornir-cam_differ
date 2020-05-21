@@ -81,7 +81,7 @@ def kickoff():
             c_print(f"*** {host} ***")
 
     c_print("Checking inventory for credentials")
-    # check for existing credentials in inventory
+    # check for shared credentials in inventory
 
     if nr.inventory.defaults.username == None or nr.inventory.defaults.password == None:
         c_print("Please enter device credentials:")
@@ -129,6 +129,7 @@ def unique_entries(mode):
         compare = json.load(infile)
 
     unique = []
+    shared = []
 
     for entry in entries:
         if (
@@ -143,21 +144,34 @@ def unique_entries(mode):
             != None
         ):
             unique.append(entry)
+        else:
+            shared.append(entry)
 
-    return unique
+    return unique, shared
 
 
 def diff_cam(task):
 
     c_print("Unique entries seen before migration")
 
-    pre_only = unique_entries("pre")
-    pprint(pre_only)
+    pre_unique, pre_shared = unique_entries("pre")
+    pprint(pre_unique)
 
     c_print("Unique entries seen after migration")
 
-    post_only = unique_entries("post")
-    pprint(post_only)
+    post_unique, post_shared = unique_entries("post")
+    pprint(post_unique)
+
+    if pre_shared == post_shared:
+        c_print("MATCH")
+
+    c_print("Shared entries seen before migration")
+
+    pprint(pre_shared)
+
+    c_print("Shared entries seen after migration")
+
+    pprint(post_shared)
 
     """
 
