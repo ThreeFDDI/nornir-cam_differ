@@ -97,15 +97,25 @@ def kickoff():
 
 
 def set_mode():
-    c_print("Please select script mode of operation:")
-    print(" " * 20 + "1. Pre migration CAM table collection")
-    print(" " * 20 + "2. Post migration CAM table collection\n")
-    mode = input(" " * 20 + "Mode: ")
 
-    if str(mode) == "2":
-        mode = "post"
-    else:
-        mode = "pre"
+    mode = None
+
+    while mode not in ["pre", "post", "diff"]:
+        c_print("Please select script mode of operation:")
+        print(" " * 20 + "1. Pre migration CAM table collection")
+        print(" " * 20 + "2. Post migration CAM table collection")
+        print(" " * 20 + "3. Diff pre-collected CAM table outputs\n")
+    
+        mode = str(input(" " * 20 + "Mode: "))
+
+        if str(mode) == "1":
+            mode = "pre"
+        elif str(mode) == "2":
+            mode = "post"
+        elif str(mode) == "3":
+            mode = "diff"
+        else:
+            c_print("Please enter a valid option")
 
     return mode
 
@@ -190,8 +200,8 @@ def main():
     nr = kickoff()
 
     # set script mode to pre or post
-    # mode = set_mode()
-    # print(mode)
+    #mode = set_mode()
+
     # diff CAM table
     c_print(f"Compare pre and post CAM tables for each device")
     # run The Norn to diff CAM table
