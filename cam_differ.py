@@ -1,6 +1,5 @@
 import sys
 import json
-import difflib
 from getpass import getpass
 from nornir import InitNornir
 from nornir.plugins.tasks.networking import netmiko_send_command
