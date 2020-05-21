@@ -10,7 +10,7 @@
   "destination_port": "Gi1/0/10",
   "type": "DYNAMIC",
   "vlan": "10"},
- {"destination_address": "0011.aaaa.a400",
+ {"destination_address": "0011.bbbb.a400",
   "destination_port": "Gi1/0/23",
   "type": "DYNAMIC",
   "vlan": "666"},
