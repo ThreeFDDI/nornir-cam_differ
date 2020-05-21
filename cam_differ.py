@@ -96,6 +96,7 @@ def kickoff():
     return nr
 
 
+# set mode of operation
 def set_mode():
 
     mode = None
@@ -120,21 +121,27 @@ def set_mode():
     return mode
 
 
-def get_cam(task):
+# get CAM tables from devices
+def get_cam(task, mode):
     cmd = "show mac address | exclude criterion"
     cam = task.run(task=netmiko_send_command, command_string=cmd, use_textfsm=True)
 
+    # write cam table output for each host
+    with open(f"output/{task.host}_{mode}_cam.txt", "w+") as file:
+        json.dump(cam.result, file)
 
-def unique_entries(mode):
+
+# parse for unique MAC addresses
+def unique_entries(task, mode):
     if mode == "pre":
         alt_mode = "post"
     else:
         alt_mode = "pre"
 
-    with open(f"test_data/{mode}_data.txt", "r") as infile:
+    with open(f"output/{task.host}_{mode}_cam.txt", "r") as infile:
         entries = json.load(infile)
 
-    with open(f"test_data/{alt_mode}_data.txt", "r") as infile:
+    with open(f"output/{task.host}_{alt_mode}_cam.txt", "r") as infile:
         compare = json.load(infile)
 
     unique = []
@@ -159,20 +166,26 @@ def unique_entries(mode):
     return unique, shared
 
 
+# diff pre/post CAM tables
 def diff_cam(task):
 
     c_print(f"*** {task.host}: unique entries seen only before migration: ***")
 
-    pre_unique, pre_shared = unique_entries("pre")
+    pre_unique, pre_shared = unique_entries(task, "pre")
     for entry in pre_unique:
-        print(entry)
+        print(
+            f"MAC: {entry['destination_address']}"
+            + f" | port: {entry['destination_port']}"
+        )
 
     c_print(f"*** {task.host}: unique entries seen only after migration: ***")
 
-    post_unique, post_shared = unique_entries("post")
+    post_unique, post_shared = unique_entries(task, "post")
     for entry in post_unique:
-        print(entry)
-
+        print(
+            f"MAC: {entry['destination_address']}"
+            + f" | port: {entry['destination_port']}"
+        )
     c_print(
         f"*** {task.host}: shared entries with port mismatches after migration: ***"
     )
@@ -186,7 +199,7 @@ def diff_cam(task):
             ):
                 print(
                     f"MAC: {entry['destination_address']}"
-                    + f" | old port: {pre_port}"
+                    + f" | old port: {entry['destination_port']}"
                     + f" | new port: {alt['destination_port']}"
                 )
     print()
@@ -201,12 +214,21 @@ def main():
     nr = kickoff()
 
     # set script mode to pre or post
-    # mode = set_mode()
+    mode = set_mode()
+    #mode = "pre"
 
-    # diff CAM table
-    c_print(f"Compare pre and post CAM tables for each device")
-    # run The Norn to diff CAM table
-    nr.run(task=diff_cam)
+    if "pre" in mode or "post" in mode:
+        # get CAM table from devices
+        c_print(f"Get CAM table for each device")
+        # run The Norn to get CAM tables
+        nr.run(task=get_cam, mode=mode)
+
+    if "post" in mode or "diff" in mode:
+        # diff CAM table
+        c_print(f"Compare pre and post CAM tables for each device")
+        # run The Norn to diff CAM table
+        nr.run(task=diff_cam)
+
     c_print(f"Failed hosts: {nr.data.failed_hosts}")
     print("~" * 80)
 
