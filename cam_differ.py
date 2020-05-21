@@ -156,43 +156,30 @@ def unique_entries(mode):
 
 def diff_cam(task):
 
-    c_print("Unique entries seen before migration")
+    c_print("Unique entries seen only before migration:")
 
     pre_unique, pre_shared = unique_entries("pre")
-    pprint(pre_unique)
+    for entry in pre_unique:
+        print(entry)
 
-    c_print("Unique entries seen after migration")
+    c_print("Unique entries seen only after migration:")
 
     post_unique, post_shared = unique_entries("post")
-    pprint(post_unique)
+    for entry in post_unique:
+        print(entry)
 
     if pre_shared == post_shared:
         c_print("MATCH")
 
-    c_print("Shared entries seen before migration")
-
-    pprint(pre_shared)
-
-    c_print("Shared entries seen after migration")
-
-    pprint(post_shared)
+    c_print("Shared entries with port mismatches after migration:")
 
     for entry in pre_shared:
         pre_port = entry["destination_port"]
-        post_port = None
-        print(entry)
-
-    """
-
-    diff logic:
-
-    find all MACs in pre list but not in post list
-
-    find all MACs in post list but not in pre list
-
-    compare all MACs in both lists and check interface
-
-    """
+        for alt in post_shared:
+            if alt["destination_address"] == entry["destination_address"] and pre_port != alt["destination_port"]:
+                print(entry)
+                print(alt)
+                print()
 
 
 # main function
