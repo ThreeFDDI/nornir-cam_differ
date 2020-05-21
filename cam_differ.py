@@ -111,8 +111,6 @@ def set_mode():
     return mode
 
 
-
-
 def get_cam(task):
     cmd = "show mac address | exclude criterion"
     cam = task.run(
@@ -136,7 +134,6 @@ def diff_cam(task):
 
     """
 
-
     """
 
     with open("output/{task.host}_pre_cam.txt", "w+") as file:        
@@ -159,15 +156,13 @@ def diff_cam(task):
     with open('output/post_data.txt', 'r') as infile:
         post_data = json.load(infile)
 
+    pre_only = []
     
-    for entry in pre_data:
+    for pre in pre_data:
+        if next((None for post in post_data if post["destination_address"] == pre["destination_address"]), pre) != None:
+            pre_only.append(pre)
 
-        #if entry["destination_address"] not in next((item for item in post_data if item["destination_address"] == entry["destination_address"]), None):
-        print(next((item for item in post_data if item["destination_address"] == entry["destination_address"]), None))
-           #print("NOPE")
-
-    #print(next((item for item in data if item["destination_address"] == "0100.0ccc.cccc"), None))
-
+    pprint(pre_only)
 
 
 # main function
@@ -179,12 +174,12 @@ def main():
     nr = kickoff()
 
     # set script mode to pre or post
-    mode = set_mode()
-    print(mode)
+    #mode = set_mode()
+    #print(mode)
     # diff CAM table
     c_print(f"Compare pre and post CAM tables for each device")
     # run The Norn to diff CAM table
-    #nr.run(task=diff_cam)
+    nr.run(task=diff_cam)
     c_print(f"Failed hosts: {nr.data.failed_hosts}")
     print("~" * 80)
 
