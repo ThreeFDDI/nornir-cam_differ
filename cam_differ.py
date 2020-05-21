@@ -74,7 +74,7 @@ def kickoff():
 
     else:
         c_print(
-            "This script will apply IBNS dot1x configurations to Cisco Catalyst switches"
+            "This script will collect and compare CAM tables on Cisco Catalyst switches"
         )
         c_print(f"Inventory includes the following devices {site}:")
         for host in nr.inventory.hosts.keys():
@@ -97,6 +97,22 @@ def kickoff():
     return nr
 
 
+def set_mode():
+    c_print("Please select script mode of operation:")
+    print(" " * 20 + "1. Pre migration CAM table collection")
+    print(" " * 20 + "2. Post migration CAM table collection\n")
+    mode = input(" " * 20 + "Mode: ")
+
+    if str(mode) == "2":
+        mode = "post"
+    else:
+        mode = "pre"
+
+    return mode
+
+
+
+
 def get_cam(task):
     cmd = "show mac address | exclude criterion"
     cam = task.run(
@@ -108,17 +124,34 @@ def get_cam(task):
 
 def diff_cam(task):
 
-#    with open("output/{task.host}_pre_cam.txt", "w+") as file:        
-#        pre_cam = file.readlines()
-#
-#    with open("output/{task.host}_post_cam.txt", "w+") as file:        
-#        post_cam = file.readlines()
-#
-#    for line in difflib.unified_diff(pre_cam, post_cam):
-#        print(line)
+    """
 
-#    with open('output/data.txt', 'w') as outfile:
-#        json.dump(cam.result, outfile)
+    diff logic:
+
+    find all MACs in pre list but not in post list
+
+    find all MACs in post list but not in pre list
+
+    compare all MACs in both lists and check interface
+
+    """
+
+
+    """
+
+    with open("output/{task.host}_pre_cam.txt", "w+") as file:        
+        pre_cam = file.readlines()
+
+    with open("output/{task.host}_post_cam.txt", "w+") as file:        
+        post_cam = file.readlines()
+
+    for line in difflib.unified_diff(pre_cam, post_cam):
+        print(line)
+
+    with open('output/data.txt', 'w') as outfile:
+        json.dump(cam.result, outfile)
+
+    """
 
     with open('output/pre_data.txt', 'r') as infile:
         pre_data = json.load(infile)
@@ -126,13 +159,14 @@ def diff_cam(task):
     with open('output/post_data.txt', 'r') as infile:
         post_data = json.load(infile)
 
-    pprint(pre_data)
+    
+    for entry in pre_data:
 
-    c_print("~" * 80)
-    pprint(post_data)
+        #if entry["destination_address"] not in next((item for item in post_data if item["destination_address"] == entry["destination_address"]), None):
+        print(next((item for item in post_data if item["destination_address"] == entry["destination_address"]), None))
+           #print("NOPE")
 
-
-#    print(next((item for item in data if item["destination_address"] == "0100.0ccc.cccc"), None))
+    #print(next((item for item in data if item["destination_address"] == "0100.0ccc.cccc"), None))
 
 
 
@@ -144,10 +178,13 @@ def main():
     # kickoff The Norn
     nr = kickoff()
 
+    # set script mode to pre or post
+    mode = set_mode()
+    print(mode)
     # diff CAM table
     c_print(f"Compare pre and post CAM tables for each device")
     # run The Norn to diff CAM table
-    nr.run(task=diff_cam)
+    #nr.run(task=diff_cam)
     c_print(f"Failed hosts: {nr.data.failed_hosts}")
     print("~" * 80)
 
