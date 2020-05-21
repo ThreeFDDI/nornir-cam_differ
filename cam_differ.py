@@ -113,7 +113,11 @@ def set_mode():
 
 def get_cam(task):
     cmd = "show mac address | exclude criterion"
-    cam = task.run(task=netmiko_send_command, command_string=cmd, use_textfsm=True)
+    cam = task.run(
+        task=netmiko_send_command, 
+        command_string=cmd, 
+        use_textfsm=True
+    )
 
 
 def unique_entries(mode):
@@ -172,6 +176,11 @@ def diff_cam(task):
     c_print("Shared entries seen after migration")
 
     pprint(post_shared)
+
+    for entry in pre_shared:
+        pre_port = entry["destination_port"]
+        post_port = None
+        print(entry)
 
     """
 
