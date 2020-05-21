@@ -105,37 +105,35 @@ def get_cam(task):
         use_textfsm=True
     )
 
-#    for entry in cam.result:
-#        pprint(entry)
-
-
-    with open('output/data.txt', 'w') as outfile:
-        json.dump(cam.result, outfile)
-
-    with open('output/data.txt', 'r') as infile:
-        data = json.load(infile)
-
-    pprint(data)
-
-    test_entry = {'destination_address': '0100.0ccc.cccc',
-            'destination_port': 'CPU',
-            }
-
-#    if test_entry in data:
-#        c_print("WIN")
-
-#    print(next((item for item in data if item["destination_address"] == "0100.0ccc.cccc"), None))
 
 def diff_cam(task):
 
-    with open("output/{task.host}_pre_cam.txt", "w+") as file:        
-        pre_cam = file.readlines()
+#    with open("output/{task.host}_pre_cam.txt", "w+") as file:        
+#        pre_cam = file.readlines()
+#
+#    with open("output/{task.host}_post_cam.txt", "w+") as file:        
+#        post_cam = file.readlines()
+#
+#    for line in difflib.unified_diff(pre_cam, post_cam):
+#        print(line)
 
-    with open("output/{task.host}_post_cam.txt", "w+") as file:        
-        post_cam = file.readlines()
+#    with open('output/data.txt', 'w') as outfile:
+#        json.dump(cam.result, outfile)
 
-    for line in difflib.unified_diff(pre_cam, post_cam):
-        print(line)
+    with open('output/pre_data.txt', 'r') as infile:
+        pre_data = json.load(infile)
+
+    with open('output/post_data.txt', 'r') as infile:
+        post_data = json.load(infile)
+
+    pprint(pre_data)
+
+    c_print("~" * 80)
+    pprint(post_data)
+
+
+#    print(next((item for item in data if item["destination_address"] == "0100.0ccc.cccc"), None))
+
 
 
 # main function
@@ -146,10 +144,10 @@ def main():
     # kickoff The Norn
     nr = kickoff()
 
-    # get CAM table
-    c_print(f"Gather CAM table for each device")
-    # run The Norn to gather CAM table
-    nr.run(task=get_cam)
+    # diff CAM table
+    c_print(f"Compare pre and post CAM tables for each device")
+    # run The Norn to diff CAM table
+    nr.run(task=diff_cam)
     c_print(f"Failed hosts: {nr.data.failed_hosts}")
     print("~" * 80)
 
