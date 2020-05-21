@@ -105,7 +105,7 @@ def set_mode():
         print(" " * 20 + "1. Pre migration CAM table collection")
         print(" " * 20 + "2. Post migration CAM table collection")
         print(" " * 20 + "3. Diff pre-collected CAM table outputs\n")
-    
+
         mode = str(input(" " * 20 + "Mode: "))
 
         if str(mode) == "1":
@@ -122,11 +122,7 @@ def set_mode():
 
 def get_cam(task):
     cmd = "show mac address | exclude criterion"
-    cam = task.run(
-        task=netmiko_send_command, 
-        command_string=cmd, 
-        use_textfsm=True
-    )
+    cam = task.run(task=netmiko_send_command, command_string=cmd, use_textfsm=True)
 
 
 def unique_entries(mode):
@@ -177,15 +173,22 @@ def diff_cam(task):
     for entry in post_unique:
         print(entry)
 
-    c_print(f"*** {task.host}: shared entries with port mismatches after migration: ***")
+    c_print(
+        f"*** {task.host}: shared entries with port mismatches after migration: ***"
+    )
 
     for entry in pre_shared:
         pre_port = entry["destination_port"]
         for alt in post_shared:
-            if alt["destination_address"] == entry["destination_address"] and pre_port != alt["destination_port"]:
-                print(f"MAC: {entry['destination_address']}" \
-                + f" | old port: {pre_port}" \
-                + f" | new port: {alt['destination_port']}")
+            if (
+                alt["destination_address"] == entry["destination_address"]
+                and pre_port != alt["destination_port"]
+            ):
+                print(
+                    f"MAC: {entry['destination_address']}"
+                    + f" | old port: {pre_port}"
+                    + f" | new port: {alt['destination_port']}"
+                )
     print()
 
 
@@ -198,7 +201,7 @@ def main():
     nr = kickoff()
 
     # set script mode to pre or post
-    #mode = set_mode()
+    # mode = set_mode()
 
     # diff CAM table
     c_print(f"Compare pre and post CAM tables for each device")
