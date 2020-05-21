@@ -29,24 +29,6 @@ def proceed():
         c_print("********* PROCEEDING *********")
 
 
-# test Nornir textfsm result
-def test_norn_textfsm(task, result, cmd):
-    """
-    Test Nornir result expected to be a dict within a list
-    """
-    if type(result) != list or type(result[0]) != dict:
-        c_print(f'*** {task.host}: ERROR running "{cmd}" ***')
-
-
-# test Nornir result
-def test_norn(task, result):
-    """
-    Test Nornir result expected to be a string
-    """
-    if type(result) != str:
-        c_print(f"*** {task.host}: ERROR running Nornir task ***")
-
-
 # set device credentials
 def kickoff():
     """
@@ -114,7 +96,7 @@ def kickoff():
 
 
 def get_cam(task):
-    cmd = "authentication display new-style"
+    cmd = "show mac address | exclude criterion"
     cam = task.run(
         task=netmiko_send_command, 
         command_string=cmd,
@@ -131,10 +113,13 @@ def main():
     # kickoff The Norn
     nr = kickoff()
 
-    # enable SCP
-    c_print(f"Enabling SCP for NAPALM on all devices")
-    # run The Norn to enable SCP
+    # get CAM table
+    c_print(f"Gather CAM table for each device")
+    # run The Norn to gather CAM table
     nr.run(task=get_cam)
     c_print(f"Failed hosts: {nr.data.failed_hosts}")
     print("~" * 80)
 
+
+if __name__ == "__main__":
+    main()
