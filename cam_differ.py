@@ -113,11 +113,7 @@ def set_mode():
 
 def get_cam(task):
     cmd = "show mac address | exclude criterion"
-    cam = task.run(
-        task=netmiko_send_command, 
-        command_string=cmd,
-        use_textfsm=True
-    )
+    cam = task.run(task=netmiko_send_command, command_string=cmd, use_textfsm=True)
 
 
 def unique_entries(mode):
@@ -126,21 +122,30 @@ def unique_entries(mode):
     else:
         alt_mode = "pre"
 
-    with open(f'output/{mode}_data.txt', 'r') as infile:
+    with open(f"output/{mode}_data.txt", "r") as infile:
         entries = json.load(infile)
 
-    with open(f'output/{alt_mode}_data.txt', 'r') as infile:
+    with open(f"output/{alt_mode}_data.txt", "r") as infile:
         compare = json.load(infile)
-    
+
     unique = []
 
     for entry in entries:
-        if next(
-            (None for alt in compare if alt["destination_address"] == entry["destination_address"]),
-             entry) != None:
+        if (
+            next(
+                (
+                    None
+                    for alt in compare
+                    if alt["destination_address"] == entry["destination_address"]
+                ),
+                entry,
+            )
+            != None
+        ):
             unique.append(entry)
 
     return unique
+
 
 def diff_cam(task):
 
@@ -167,7 +172,6 @@ def diff_cam(task):
     """
 
 
-
 # main function
 def main():
     """
@@ -177,8 +181,8 @@ def main():
     nr = kickoff()
 
     # set script mode to pre or post
-    #mode = set_mode()
-    #print(mode)
+    # mode = set_mode()
+    # print(mode)
     # diff CAM table
     c_print(f"Compare pre and post CAM tables for each device")
     # run The Norn to diff CAM table
