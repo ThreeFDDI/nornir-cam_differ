@@ -117,6 +117,15 @@ def get_cam(task):
 
     pprint(data)
 
+    test_entry = {'destination_address': '0100.0ccc.cccc',
+            'destination_port': 'CPU',
+            }
+
+#    if test_entry in data:
+#        c_print("WIN")
+
+#    print(next((item for item in data if item["destination_address"] == "0100.0ccc.cccc"), None))
+
 def diff_cam(task):
 
     with open("output/{task.host}_pre_cam.txt", "w+") as file:        
