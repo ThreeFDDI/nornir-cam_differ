@@ -227,7 +227,7 @@ def main():
         # diff CAM table
         c_print(f"Compare pre and post CAM tables for each device")
         # run The Norn to diff CAM table
-        nr.run(task=diff_cam)
+        nr.run(task=diff_cam, num_workers = 1)
 
     c_print(f"Failed hosts: {nr.data.failed_hosts}")
     print("~" * 80)
