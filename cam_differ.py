@@ -122,10 +122,10 @@ def unique_entries(mode):
     else:
         alt_mode = "pre"
 
-    with open(f"output/{mode}_data.txt", "r") as infile:
+    with open(f"test_data/{mode}_data.txt", "r") as infile:
         entries = json.load(infile)
 
-    with open(f"output/{alt_mode}_data.txt", "r") as infile:
+    with open(f"test_data/{alt_mode}_data.txt", "r") as infile:
         compare = json.load(infile)
 
     unique = []
